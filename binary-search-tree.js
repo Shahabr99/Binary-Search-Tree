@@ -140,14 +140,35 @@ class BinarySearchTree {
    * Return an array of visited nodes. */
 
   dfsPostOrder() {
-
+    let nodes = [];
+    let currentNode = this.root;
+    function traverse(node){
+      node.left && traverse(node.left);
+      node.right && traverse(node.right);
+      nodes.push(node.val)
+    }
+    traverse(currentNode);
+    return nodes
   }
 
   /** bfs(): Traverse the array using BFS.
    * Return an array of visited nodes. */
-
   bfs() {
-
+    let node = this.root;
+    let queue = [];
+    let data = [];
+    queue.push(node);
+    while (queue.length) {
+      node = queue.shift();
+      data.push(node.val);
+      if (node.left) {
+        queue.push(node.left);
+      }
+      if (node.right) {
+        queue.push(node.right);
+      }
+    }
+    return data;
   }
 
   /** Further Study!
@@ -155,14 +176,79 @@ class BinarySearchTree {
    * Returns the removed node. */
 
   remove(val) {
-
+    let targetNode = this.root;
+    let parent;
+    while(targetNode.val !== val) {
+      parent = targetNode;
+      val < targetNode.val ? targetNode.left : targetNode.right
+    }
+    if(targetNode !== this.root){
+      if(targetNode.left === null && targetNode.right === null) {
+        if(parent.left === targetNode) {
+          parent.left = null
+        }else{
+          parent.right=null
+        }
+      }else if(targetNode.left !== null && targetNode.right !== null){
+        let rightParent = targetNode;
+        let right = targetNode.right;
+        if(right.left === null) {
+          right.left = targetNode.left
+          if (parent.left === targetNode) {
+            parent.left = right;
+          } else {
+            parent.right = right;
+          }
+        } else {
+          while (right.left !== null) {
+            rightParent = right;
+            right = right.left;
+          }
+          if (parent.left === targetNode) {
+            parent.left.val = right.val;
+          } else {
+            parent.right.val = right.val;
+          }
+          if (right.right !== null) {
+            rightParent.left = right.right;
+          } else {
+            rightParent.left = null;
+          }
+        }
+      } else {
+        if (parent.left === nodeToRemove) {
+          if (nodeToRemove.right === null) {
+            parent.left = nodeToRemove.left;
+          } else {
+            parent.left = nodeToRemove.right;
+          }
+        } else {
+          if (nodeToRemove.right === null) {
+            parent.right = nodeToRemove.left;
+          } else {
+            parent.right = nodeToRemove.right;
+          }
+        }
+      }
+    }
+    return nodeToRemove;
   }
+
 
   /** Further Study!
    * isBalanced(): Returns true if the BST is balanced, false otherwise. */
 
   isBalanced() {
-
+    if (current === null) return;
+    return maxDepth(current) - minDepth(current) <= 1;
+    function minDepth(current) {
+      if (current === null) return 0;
+      return 1 + Math.min(minDepth(current.left), minDepth(current.right));
+    }
+    function maxDepth(current) {
+      if (current === null) return 0;
+      return 1 + Math.max(maxDepth(current.left), maxDepth(current.right));
+    }
   }
 
   /** Further Study!
@@ -170,9 +256,39 @@ class BinarySearchTree {
    * Otherwise return undefined. */
 
   findSecondHighest() {
-    
+    // if the tree is too small, return
+    if (!this.root || (!this.root.left && !this.root.right)) return;
+    while (current) {
+      // Current is largest and has a left subtree and 2nd largest is the largest in that subtree
+      if (current.left && !current.right) {
+        return this.findSecondHighest(current.left);
+      }
+      // Current is parent of largest and largest has no children so current is 2nd largest
+      if (current.right && (!current.right.left && !current.right.right)) {
+        return current.val;
+      }
+      current = current.right;
+    }
+  }
+  dfsInOrderIterative() {
+    let cur = this.root;
+    let stack = [];
+    let dfs = [];
+    while (stack.length > 0 || cur) {
+      while (cur) {
+        stack.push(cur);
+        cur = cur.left;
+      }
+      cur = stack.pop();
+      if (cur) {
+        dfs.push(cur.val);
+        cur = cur.right;
+      }
+    }
+    return dfs;
   }
 }
+
 
 
 
